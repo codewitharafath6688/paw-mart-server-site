@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 require("dotenv").config()
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 const port = process.env.PORT || 3000;
 
@@ -45,6 +45,45 @@ async function run() {
         const newAdd = req.body;
         const result = await addCollection.insertOne(newAdd);
         res.send(result);
+    })
+
+    app.get('/addList', async (req, res) => {
+        const cursor = addCollection.find();
+        const result = await cursor.toArray();
+        res.send(result);
+    })
+
+    app.patch('/addList/:id', async (req, res) => {
+        const id = req.params.id;
+        const updateList = req.body;
+        const query = {_id: new ObjectId(id)};
+        const update = {
+          $set: {
+            name: updateList.name,
+            image: updateList.image,
+            price: updateList.price,
+            location: updateList.location,
+            describe: updateList.describe,
+            category: updateList.category
+          }
+        }
+        const option = {};
+        const result = await addCollection.updateOne(query, update, option);
+        res.json(result);
+    })
+
+    app.delete('/addList/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = {_id: new ObjectId(id)};
+        const result = await addCollection.deleteOne(query);
+        res.json(result);
+    })
+
+    app.get('/addList/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = {_id: new ObjectId(id)};
+        const result = await addCollection.findOne(query);
+        res.json(result);
     })
 
     await client.db("admin").command({ ping: 1 });
