@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-require("dotenv").config()
+require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 const port = process.env.PORT || 3000;
@@ -27,71 +27,86 @@ async function run() {
     await client.connect();
     const db = client.db("paw-mart-user");
     const petCollection = db.collection("pets");
-    const addCollection = db.collection("addList")
+    const addCollection = db.collection("addList");
+    const orderCollection = db.collection("order");
 
-    app.get('/pets', async (req, res) => {
-        const cursor = petCollection.find().limit(6);
-        const result = await cursor.toArray();
-        res.send(result);
-    })
+    app.get("/pets", async (req, res) => {
+      const cursor = petCollection.find().limit(6);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
 
-    app.get('/allpets', async (req, res) => {
-        const cursor = petCollection.find();
-        const result = await cursor.toArray();
-        res.send(result);
-    })
+    app.get("/allpets", async (req, res) => {
+      const cursor = petCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
 
-    app.post('/addList', async (req, res) => {
-        const newAdd = req.body;
-        const result = await addCollection.insertOne(newAdd);
-        res.send(result);
-    })
+    app.get("/allpets/:id", async (req, res) => {
+      const cursor = petCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
 
-    app.get('/addList', async (req, res) => {
-        const cursor = addCollection.find();
-        const result = await cursor.toArray();
-        res.send(result);
-    })
+    app.post("/addList", async (req, res) => {
+      const newAdd = req.body;
+      const result = await addCollection.insertOne(newAdd);
+      res.send(result);
+    });
 
-    app.patch('/addList/:id', async (req, res) => {
-        const id = req.params.id;
-        const updateList = req.body;
-        const query = {_id: new ObjectId(id)};
-        const update = {
-          $set: {
-            name: updateList.name,
-            image: updateList.image,
-            price: updateList.price,
-            location: updateList.location,
-            describe: updateList.describe,
-            category: updateList.category
-          }
-        }
-        const option = {};
-        const result = await addCollection.updateOne(query, update, option);
-        res.json(result);
-    })
+    app.get("/addList", async (req, res) => {
+      const cursor = addCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
 
-    app.delete('/addList/:id', async (req, res) => {
-        const id = req.params.id;
-        const query = {_id: new ObjectId(id)};
-        const result = await addCollection.deleteOne(query);
-        res.json(result);
-    })
+    app.patch("/addList/:id", async (req, res) => {
+      const id = req.params.id;
+      const updateList = req.body;
+      const query = { _id: new ObjectId(id) };
+      const update = {
+        $set: {
+          name: updateList.name,
+          image: updateList.image,
+          price: updateList.price,
+          location: updateList.location,
+          describe: updateList.describe,
+          category: updateList.category,
+        },
+      };
+      const option = {};
+      const result = await addCollection.updateOne(query, update, option);
+      res.send(result);
+    });
 
-    app.get('/addList/:id', async (req, res) => {
-        const id = req.params.id;
-        const query = {_id: new ObjectId(id)};
-        const result = await addCollection.findOne(query);
-        res.json(result);
-    })
+    app.delete("/addList/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await addCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    app.get("/addList", async (req, res) => {
+      const query = {};
+      if (query.email) {
+        query.ownerEmail = email;
+      }
+      const cursor = addCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.post("/order", async (req, res) => {
+      const oderData = req.body;
+      const result = await orderCollection.insertOne(oderData);
+      res.send(result);
+    });
 
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
   } finally {
-    
   }
 }
 run().catch(console.dir);
