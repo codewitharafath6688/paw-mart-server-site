@@ -49,8 +49,8 @@ async function run() {
     });
 
     app.post("/addList", async (req, res) => {
-      const newAdd = req.body;
-      const result = await addCollection.insertOne(newAdd);
+      const newItem = req.body;
+      const result = await addCollection.insertOne(newItem);
       res.send(result);
     });
 
